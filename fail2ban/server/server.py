@@ -401,7 +401,8 @@ class Server:
 						and os.path.exists(self.__syslogSocket)\
 						and stat.S_ISSOCK(os.stat(
 								self.__syslogSocket).st_mode):
-					hdlr = logging.handlers.SysLogHandler(
+					hdlr = logging.handlers.SysLogHandler()
+                                        hdlr.setFormatter(formatter)
 						self.__syslogSocket, facility=facility)
 				else:
 					logSys.error(
@@ -410,8 +411,13 @@ class Server:
 					return False
 			elif target == "STDOUT":
 				hdlr = logging.StreamHandler(sys.stdout)
+                                hdlr.setFormatter(formatter)
 			elif target == "STDERR":
 				hdlr = logging.StreamHandler(sys.stderr)
+                                hdlr.setFormatter(formatter)
+                        elif target == "JOURNALD":
+				from systemd.journal import JournalHandler
+                                hdlr = JournalHandler()
 			else:
 				# Target should be a file
 				try:
@@ -439,7 +445,6 @@ class Server:
 							(3,2) <= sys.version_info:
 						raise
 			# tell the handler to use this format
-			hdlr.setFormatter(formatter)
 			logger.addHandler(hdlr)
 			# Does not display this message at startup.
 			if not self.__logTarget is None:

@@ -401,9 +401,9 @@ class Server:
 						and os.path.exists(self.__syslogSocket)\
 						and stat.S_ISSOCK(os.stat(
 								self.__syslogSocket).st_mode):
-					hdlr = logging.handlers.SysLogHandler()
-                                        hdlr.setFormatter(formatter)
+					hdlr = logging.handlers.SysLogHandler(
 						self.__syslogSocket, facility=facility)
+					hdlr.setFormatter(formatter)
 				else:
 					logSys.error(
 						"Syslog socket file: %s does not exists"
@@ -411,13 +411,13 @@ class Server:
 					return False
 			elif target == "STDOUT":
 				hdlr = logging.StreamHandler(sys.stdout)
-                                hdlr.setFormatter(formatter)
+				hdlr.setFormatter(formatter)
 			elif target == "STDERR":
 				hdlr = logging.StreamHandler(sys.stderr)
-                                hdlr.setFormatter(formatter)
-                        elif target == "JOURNALD":
+				hdlr.setFormatter(formatter)
+			elif target == "JOURNALD":
 				from systemd.journal import JournalHandler
-                                hdlr = JournalHandler()
+				hdlr = JournalHandler()
 			else:
 				# Target should be a file
 				try:
